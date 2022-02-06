@@ -53,30 +53,63 @@ ssh-copy-id chosen_admin_name@remote_ip_address
 // test
 ssh chosen_admin_name@remote_ip_address
 
-------------------------------------------------------------------------------------------------------------------------
+// Follow ansible_setup.txt instructions
 
-// Each Remote Machine
+// It shouldn't be needed if the verification works ok, but open up a connection to the remotes, just in case of blowing
+// up the ssh configuration, so you can fix it instead of being locked out (tip from geerlingguy)
 
-ssh chosen_admin_name@remote_ip_address
-sudo ufw allow your_chosen_port/tcp
+// Create secure_server.yml playbook
+nano ~/ansible/secure_server.yml
 
-sudo nano /etc/ssh/sshd_config
+// add the following
 
-// modify as follows -
-Port your_chosen_port
-PasswordAuthentication no
-ChallengeResponseAuthentication no
-UsePAM no
+---
+- hosts: all
+  become: true
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: sshd
+        state: restarted
+
+  tasks:
+  - name: Tell SELinux about the SSHs new port
+    seport:
+      ports: your_chosen_port
+      proto: tcp
+      setype: ssh_port_t
+      state:: present
+
+  - name: Make SSH more secure
+    lineinfile:
+      dest: /etc/ssh/sshd_config
+      regexp: "{{ item.regexp }}"
+      line: "{{ item.line }}"
+      state: present
+      validate: 'sshd -T -f %s'
+    with_items:
+      - regexp: "^PasswordAuthentication"
+        line: "PasswordAuthentication no"
+      - regexp: "^PermitRootLogin"
+        line: "PermitRootLogin no"
+      - regexp: "^Port"
+        line: "Port your_chosen_port"
+      - regexp: "^ChallengeResponseAuthentication"
+        line: "ChallengeResponseAuthentication no"
+      - regexp: "^UsePAM"
+        line: "UsePAM no"
+    notify: restart ssh
 
 // save and exit
-sudo systemctl restart ssh
 
-------------------------------------------------------------------------------------------------------------------------
-
-// Overseer Only
+// run the playbook
+ansible-playbook ~/ansible/secure_server.yml
 
 // test connection to each remote machine
 ssh -p your_chosen_port chosen_admin_name@remote_ip_address
+
+// STOPPING HERE - RUNNING TESTS TO CHECK ALL WORKS BEFORE MOVING ON
 
 nano ~/.ssh/config
 
@@ -128,3 +161,30 @@ ssh workerD
 ssh workerS
 ssh workerM
 ssh laptopName
+
+
+
+
+
+
+//// Each Remote Machine
+//
+//ssh chosen_admin_name@remote_ip_address
+//sudo ufw allow your_chosen_port/tcp
+//sudo ufw deny 22/tcp
+//
+//sudo nano /etc/ssh/sshd_config
+//
+//// modify as follows -
+//Port your_chosen_port
+//PermitRootLogin no
+//PasswordAuthentication no
+//ChallengeResponseAuthentication no
+//UsePAM no
+//
+//// save and exit
+//sudo systemctl restart ssh
+
+------------------------------------------------------------------------------------------------------------------------
+
+// Overseer Only

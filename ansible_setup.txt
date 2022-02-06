@@ -28,10 +28,16 @@ workers
 [lubuntu]
 laptopName
 
-// Append vars
-[all:vars]
-ansible_python_interpreter=/usr/bin/python3
-ansible_user=chosen_admin_name
+// save and exit
+
+// Create a group vars folder and yml file within
+mkdir ~/ansible/group_vars
+nano ~/ansible/group_vars/all.yml
+
+// add the following
+---
+ansible_python_interpreter: /usr/bin/python3
+ansible_user: chosen_admin_name
 
 // save and exit
 
