@@ -56,3 +56,7 @@ pipelining = True
 ansible "*" -m ping
 ansible "*" -a "free -h"
 ansible "*" -a "date"
+
+// Install lints
+sudo apt install yamllint
+sudo apt install ansible-lint
