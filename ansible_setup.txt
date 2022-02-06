@@ -5,7 +5,7 @@
 sudo apt install ansible
 
 // Create ansible project folder where all the playbooks/roles etc will be created
-sudo mkdir ~/ansible
+mkdir ~/ansible
 
 // Create the inventory file
 nano ~/ansible/inventory
