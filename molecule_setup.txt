@@ -11,7 +11,36 @@ sudo pip3 install molecule
 cd ~/ansible/roles
 molecule init role 'role_name'
 
+// Inside molecule folder there are environment folders, default is provided
+// edit the molecule.yml file
 
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint: |
+  set -e
+  yamllint .
+  ansible-lint
+platforms:
+  - name: instance
+    image: geerlingguy/docker-ubuntu2004-ansible:latest (use a suitable image here for the os you wish to test against)
+    command: ""  (this will tell molecule to not run the standard command)
+    volumes:
+      - /sys/fs/cgroup:/sys/fs/cgroup:ro
+    privileged: true (only use when you trust the software you are using, otherwise false)
+    pre_build_image:true
+provisioner:
+  name: ansible
+verifier:
+  name: ansible
+
+// note - can use geerlingguy/docker-${MOLECULE_DISTRO:-ubuntu2004}-ansible:latest
+// to set the default distro it will use, then can be overridden by doing
+// MOLECULE_DISTRO=someotherdistro molecule test
+
+// save and exit
 
 // usage notes
 // cd into the role directory
