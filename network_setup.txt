@@ -1,0 +1,130 @@
+// Homelab Inventory Example
+
+master1 192.168.?.? - Virtual Box Ubuntu Server on Windows Machine
+master2 192.168.?.? - Ubuntu Server
+workerB 192.168.?.? - Ubuntu Desktop (machines that are also providing gui for specific graphical application usage)
+workerD 192.168.?.? - Ubuntu Server
+workerS 192.168.?.? - Ubuntu Desktop
+workerM 192.168.?.? - Ubuntu Server
+
+// haha yes i see it, the letters are in fact reference to physical machines location, with hilarious results
+
+// Dev tools implemented from: (Note: at my current level of experience, i have been unable to get 2 way communication
+// working, so for now others on the network cannot communicate back, only receive commands from this machine)
+overseer - wsl2 Ubuntu Server on Windows Machine
+
+// Special Guest - We have this old laptop which the other half uses from the woodworking shop or
+// barn to view files kept in storage, so this is to remind me to monitor it and update as needed
+laptopName 192.168.?.? - low resource laptop using Lubuntu, added in for manual updating and monitoring
+
+------------------------------------------------------------------------------------------------------------------------
+
+// On each remote machine install latest Ubuntu LTS as specified above
+// Set initial user to a chosen admin name and password
+
+// if not done during installation, install ssh
+sudo apt install openssh-server
+sudo systemctl enable ssh
+sudo systemctl start ssh
+
+// test from another machine
+ssh chosen_admin_name@remote_ip_address
+
+// For machines with GUI, create a non sudoer user with a chosen name and password,
+// to allow others to use graphical applications on it.
+sudo adduser chosen_name
+
+------------------------------------------------------------------------------------------------------------------------
+
+// Overseer Only
+
+// To generate a new 4096 bits SSH key pair with your email address as a comment, run:
+ssh-keygen -t rsa -b 4096 -C "your_email_address"
+
+// You will be prompted to specify the file name:
+// Enter file in which to save the key (/home/chosen_admin_name/.ssh/id_rsa):
+// The default location and file name should be fine for most users. Press Enter to accept and continue.
+// Leave the passphrase empty, just Press Enter
+// Output should be - /home/chosen_admin_name/.ssh/id_rsa /home/chosen_admin_name/.ssh/id_rsa.pub
+// Copy the public key to each remote machine
+
+ssh-copy-id chosen_admin_name@remote_ip_address
+
+// test
+ssh chosen_admin_name@remote_ip_address
+
+------------------------------------------------------------------------------------------------------------------------
+
+// Each Remote Machine
+
+ssh chosen_admin_name@remote_ip_address
+sudo ufw allow your_chosen_port/tcp
+
+sudo nano /etc/ssh/sshd_config
+
+// modify as follows -
+Port your_chosen_port
+PasswordAuthentication no
+ChallengeResponseAuthentication no
+UsePAM no
+
+// save and exit
+sudo systemctl restart ssh
+
+------------------------------------------------------------------------------------------------------------------------
+
+// Overseer Only
+
+// test connection to each remote machine
+ssh -p your_chosen_port chosen_admin_name@remote_ip_address
+
+nano ~/.ssh/config
+
+Host workerB
+    HostName 192.168.?.?
+    User chosen_admin_name
+    Port your_chosen_port
+
+Host workerD
+    HostName 192.168.?.?
+    User chosen_admin_name
+    Port your_chosen_port
+
+Host workerS
+    HostName 192.168.?.?
+    User chosen_admin_name
+    Port your_chosen_port
+
+Host workerM
+    HostName 192.168.?.?
+    User chosen_admin_name
+    Port your_chosen_port
+
+Host master1
+    HostName 192.168.?.?
+    User chosen_admin_name
+    Port your_chosen_port
+
+Host master2
+    HostName 192.168.?.?
+    User chosen_admin_name
+    Port your_chosen_port
+
+Host laptopName
+    HostName 192.168.?.?
+    User chosen_admin_name
+    Port your_chosen_port
+
+// save and exit
+
+// set permissions
+chmod 600 ~/.ssh/config
+
+// test connection to each remote machine using the above specified hostnames
+ssh master1
+ssh master2
+ssh workerB
+ssh workerD
+ssh workerS
+ssh workerM
+ssh laptopName

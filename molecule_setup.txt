@@ -1,0 +1,12 @@
+
+// Overseer only
+
+// Installer required for molecule
+sudo apt install -y python3-pip
+
+// Install molecule
+sudo pip3 install molecule
+
+// To setup a role with molecule
+cd ~/homelab/ansible/roles
+molecule init role 'role_name'

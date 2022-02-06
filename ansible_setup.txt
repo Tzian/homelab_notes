@@ -1,0 +1,58 @@
+
+// Overseer Only
+
+// Install Ansible
+sudo apt install ansible
+
+// Create ansible project folder where all the playbooks/roles etc will be created
+sudo mkdir ~/ansible
+
+// Create the inventory file
+nano ~/ansible/inventory
+
+// Add nodes and groups
+[masters]
+master1
+master2
+
+[workers]
+workerB
+workerD
+workerS
+workerM
+
+[all:children]
+masters
+workers
+
+[lubuntu]
+laptopName
+
+// Append vars
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+ansible_user=chosen_admin_name
+
+// save and exit
+
+// check what is seen in the inventory file
+ansible-inventory -i ~/ansible/inventory --list
+
+// test
+ansible -i ~/ansible/inventory "*" -m ping
+
+// override ansible defaults
+// create config file
+nano ~/ansible.cfg
+
+// Configure like this to tell ansible where to find the inventory file
+[defaults]
+INVENTORY = ~/ansible/inventory
+
+[ssh_connection]
+pipelining = True
+
+// test ping, free memory and date sync from ~/
+ansible "*" -m ping
+ansible "*" -a "free -h"
+ansible "*" -a "date"

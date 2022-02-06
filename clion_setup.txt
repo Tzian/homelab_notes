@@ -1,0 +1,23 @@
+// Overseer only
+
+// from ~/ (update version numbers as necessary)
+sudo apt update && sudo apt upgrade -y
+sudo apt install build-essential libssl-dev
+sudo apt install gdb
+
+// ensure that the version number is the latest one clion supports
+wget https://github.com/Kitware/CMake/releases/download/v3.20.2/cmake-3.21.5.tar.gz
+tar -zxvf cmake-3.21.5.tar.gz
+
+cd cmake-3.21.5
+./bootstrap
+
+make
+sudo make install
+
+------------------------------------------------------------------------------------------------------------------------
+// Set Clion to use the above installs
+// Settings> Build Execution Deployment > Toolchains
+
+CMake : \\wsl$\Ubuntu-20.04\usr\local\bin\cmake
+Debugger : \\wsl$\Ubuntu-20.04WSL GDB\
