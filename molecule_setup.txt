@@ -8,5 +8,14 @@ sudo apt install -y python3-pip
 sudo pip3 install molecule
 
 // To setup a role with molecule
-cd ~/homelab/ansible/roles
+cd ~/ansible/roles
 molecule init role 'role_name'
+
+
+
+// usage notes
+// cd into the role directory
+
+molecule test
+molecule login -> drops you into the running instance cmdline, can then navigate and check files etc
+molecule destroy -> tear the instance down and clean up

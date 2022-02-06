@@ -39,7 +39,7 @@ ansible_user=chosen_admin_name
 ansible-inventory -i ~/ansible/inventory --list
 
 // test
-ansible -i ~/ansible/inventory "*" -m ping
+ansible -i ~/ansible/inventory all -m ping
 
 // override ansible defaults
 // create config file
@@ -53,10 +53,15 @@ INVENTORY = ~/ansible/inventory
 pipelining = True
 
 // test ping, free memory and date sync from ~/
-ansible "*" -m ping
-ansible "*" -a "free -h"
-ansible "*" -a "date"
+ansible all -m ping
+ansible all -a "free -h"
+ansible all -a "date"
 
 // Install lints
 sudo apt install yamllint
 sudo apt install ansible-lint
+
+// lint usage (-c used to indicate where yamllint config is located)
+// ideally should be set as an env var, but atm having trouble with them persisting on WSL
+yamllint -c ~/ansible/.yamllint ~/ansible
+ansible-lint ~/ansible
