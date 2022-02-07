@@ -27,42 +27,49 @@ sudo apt install openssh-server
 sudo systemctl enable ssh
 sudo systemctl start ssh
 
-// test from another machine
-ssh chosen_admin_name@remote_ip_address
-
-// For machines with GUI, create a non sudoer user with a chosen name and password,
-// to allow others to use graphical applications on it.
-sudo adduser chosen_name
-
 ------------------------------------------------------------------------------------------------------------------------
-
 // Overseer Only
 
-// To generate a new 4096 bits SSH key pair with your email address as a comment, run:
-ssh-keygen -t rsa -b 4096 -C "your_email_address"
+// Use the following to create your own private key, or use the one issued by the host provider
 
-// You will be prompted to specify the file name:
-// Enter file in which to save the key (/home/chosen_admin_name/.ssh/id_rsa):
-// The default location and file name should be fine for most users. Press Enter to accept and continue.
+// To generate a new 4096 bits SSH key pair with your email address as a comment
+// You will be prompted to specify the file name: (/home/chosen_admin_name/.ssh/id_rsa)
+// Press Enter to accept and continue.
 // Leave the passphrase empty, just Press Enter
 // Output should be - /home/chosen_admin_name/.ssh/id_rsa /home/chosen_admin_name/.ssh/id_rsa.pub
-// Copy the public key to each remote machine
+ssh-keygen -t rsa -b 4096 -C "your_email_address"
 
+// Give each remote machine a copy of the public key
 ssh-copy-id chosen_admin_name@remote_ip_address
 
-// test
-ssh chosen_admin_name@remote_ip_address
+// create ssh configuration file
+nano ~/.ssh/config
 
-// Follow ansible_setup.txt instructions
+// list your remote servers like so
+Host chosen_host_name (eg: master1, worker1, aws3, however you find easiest to refer to them)
+    HostName servers_url
+    User chosen_admin_name
+    Port 22
 
-// It shouldn't be needed if the verification works ok, but open up a connection to the remotes, just in case of blowing
-// up the ssh configuration, so you can fix it instead of being locked out (tip from geerlingguy)
+Host chosen_host_name
+    HostName servers_url
+    User chosen_admin_name
+    Port 22
+
+// save and exit
+
+// set permissions
+chmod 600 ~/.ssh/config
+
+//** Follow ansible_setup.txt instructions, then return to here **//
 
 // Create secure_server.yml playbook
-nano ~/ansible/secure_server.yml
+// Going to need community.general.ufw so install that now
+ansible-galaxy collection install community.general
+
+nano ~/ansible/playbooks/secure_server/main.yml
 
 // add the following
-
 ---
 - hosts: all
   become: true
@@ -74,117 +81,58 @@ nano ~/ansible/secure_server.yml
         state: restarted
 
   tasks:
-  - name: Tell SELinux about the SSHs new port
-    seport:
-      ports: your_chosen_port
-      proto: tcp
-      setype: ssh_port_t
-      state:: present
+    - name: Make SSH more secure
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+        validate: 'sshd -T -f %s'
+      with_items:
+        - regexp: "^#?PasswordAuthentication"
+          line: "PasswordAuthentication no"
+        - regexp: "^#?PermitRootLogin"
+          line: "PermitRootLogin no"
+        - regexp: "^#?Port"
+          line: "Port your_chosen_port"
+        - regexp: "^#?ChallengeResponseAuthentication"
+          line: "ChallengeResponseAuthentication no"
+        - regexp: "^#?UsePAM"
+          line: "UsePAM no"
+      notify: restart ssh
 
-  - name: Make SSH more secure
-    lineinfile:
-      dest: /etc/ssh/sshd_config
-      regexp: "{{ item.regexp }}"
-      line: "{{ item.line }}"
-      state: present
-      validate: 'sshd -T -f %s'
-    with_items:
-      - regexp: "^PasswordAuthentication"
-        line: "PasswordAuthentication no"
-      - regexp: "^PermitRootLogin"
-        line: "PermitRootLogin no"
-      - regexp: "^Port"
-        line: "Port your_chosen_port"
-      - regexp: "^ChallengeResponseAuthentication"
-        line: "ChallengeResponseAuthentication no"
-      - regexp: "^UsePAM"
-        line: "UsePAM no"
-    notify: restart ssh
+    - name: Deny all access to port 22
+      community.general.ufw:
+        rule: deny
+        port: '22'
+
+    - name: Allow access to port your_chosen_port
+      community.general.ufw:
+        rule: allow
+        port: your_chosen_port
 
 // save and exit
 
-// run the playbook
-ansible-playbook ~/ansible/secure_server.yml
+// run the playbook - you will be asked for the Become(sudo) password because of the -K flag
+ansible-playbook -K ~/ansible/playbooks/secure_server/main.yml
 
 // test connection to each remote machine
 ssh -p your_chosen_port chosen_admin_name@remote_ip_address
 
-// STOPPING HERE - RUNNING TESTS TO CHECK ALL WORKS BEFORE MOVING ON
-
+// Update the ssh config file made earlier
 nano ~/.ssh/config
 
-Host workerB
-    HostName 192.168.?.?
-    User chosen_admin_name
-    Port your_chosen_port
-
-Host workerD
-    HostName 192.168.?.?
-    User chosen_admin_name
-    Port your_chosen_port
-
-Host workerS
-    HostName 192.168.?.?
-    User chosen_admin_name
-    Port your_chosen_port
-
-Host workerM
-    HostName 192.168.?.?
-    User chosen_admin_name
-    Port your_chosen_port
-
-Host master1
-    HostName 192.168.?.?
-    User chosen_admin_name
-    Port your_chosen_port
-
-Host master2
-    HostName 192.168.?.?
-    User chosen_admin_name
-    Port your_chosen_port
-
-Host laptopName
-    HostName 192.168.?.?
+// for each remote host changed by the secure_server playbook, update the Port: entry to your chosen port
+Host remote_server_name
+    HostName servers_url
     User chosen_admin_name
     Port your_chosen_port
 
 // save and exit
 
-// set permissions
-chmod 600 ~/.ssh/config
-
-// test connection to each remote machine using the above specified hostnames
+// test connection to the changed remote machine using the hostname you gave it eg:
 ssh master1
-ssh master2
-ssh workerB
-ssh workerD
-ssh workerS
-ssh workerM
-ssh laptopName
 
-
-
-
-
-
-//// Each Remote Machine
-//
-//ssh chosen_admin_name@remote_ip_address
-//sudo ufw allow your_chosen_port/tcp
-//sudo ufw deny 22/tcp
-//
-//sudo nano /etc/ssh/sshd_config
-//
-//// modify as follows -
-//Port your_chosen_port
-//PermitRootLogin no
-//PasswordAuthentication no
-//ChallengeResponseAuthentication no
-//UsePAM no
-//
-//// save and exit
-//sudo systemctl restart ssh
-
-------------------------------------------------------------------------------------------------------------------------
-
-// Overseer Only
+// For machines with GUI, create a non sudoer user with a chosen name and password,
+// to allow others to use graphical applications on it.
+sudo adduser chosen_name

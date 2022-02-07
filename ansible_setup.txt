@@ -67,7 +67,24 @@ ansible all -a "date"
 sudo apt install yamllint
 sudo apt install ansible-lint
 
-// lint usage (-c used to indicate where yamllint config is located)
-// ideally should be set as an env var, but atm having trouble with them persisting on WSL
+// Create .yamllint file and add desired configurations
+nano ~/ansible/.yamllint
+
+// eg:
+---
+extends: default
+
+rules:
+  truthy:
+    allowed-values:
+      - 'true'
+      - 'false'
+      - 'yes'
+      - 'no'
+
+// save and exit
+
+// lint usage (-c used to indicate where .yamllint config file is located)
+// ideally should be set as an env var, but atm having trouble with getting them to persist on WSL
 yamllint -c ~/ansible/.yamllint ~/ansible
 ansible-lint ~/ansible
