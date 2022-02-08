@@ -69,7 +69,7 @@ ansible-galaxy collection install community.general
 
 nano ~/ansible/playbooks/secure_server/main.yml
 
-// add the following
+// add the following, ensuring to change things like your_chosen_port to the actual port you have chosen :D
 ---
 - hosts: all
   become: true
@@ -81,6 +81,12 @@ nano ~/ansible/playbooks/secure_server/main.yml
         state: restarted
 
   tasks:
+    - name: Apt Update and Upgrade
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+        upgrade: 'yes'
+
     - name: Make SSH more secure
       lineinfile:
         dest: /etc/ssh/sshd_config
@@ -101,6 +107,11 @@ nano ~/ansible/playbooks/secure_server/main.yml
           line: "UsePAM no"
       notify: restart ssh
 
+    - name: Edit file permissions
+      file:
+        path: /etc/ssh/sshd_config
+        mode: 0600
+
     - name: Deny all access to port 22
       community.general.ufw:
         rule: deny
@@ -110,6 +121,12 @@ nano ~/ansible/playbooks/secure_server/main.yml
       community.general.ufw:
         rule: allow
         port: your_chosen_port
+
+    - name: Auto remove unused packages
+      apt:
+        autoremove: 'yes'
+        purge: 'yes'
+
 
 // save and exit
 
