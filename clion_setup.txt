@@ -6,7 +6,7 @@ sudo apt install build-essential libssl-dev
 sudo apt install gdb
 
 // ensure that the version number is the latest one clion supports
-wget https://github.com/Kitware/CMake/releases/download/v3.20.2/cmake-3.21.5.tar.gz
+wget https://github.com/Kitware/CMake/releases/download/v3.21.5/cmake-3.21.5.tar.gz
 tar -zxvf cmake-3.21.5.tar.gz
 
 cd cmake-3.21.5
