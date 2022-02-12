@@ -10,7 +10,8 @@ workerM 192.168.?.? - Ubuntu Server
 // haha yes i see it, the letters are in fact reference to physical machines location, with hilarious results
 
 // Dev tools implemented from: (Note: at my current level of experience, i have been unable to get 2 way communication
-// working, so for now others on the network cannot communicate back, only receive commands from this machine)
+// working, so for now others on the network cannot communicate back, only receive commands from this machine, which
+// is good enough for now)
 overseer - wsl2 Ubuntu Server on Windows Machine
 
 // Special Guest - We have this old laptop which the other half uses from the woodworking shop or
@@ -30,6 +31,7 @@ sudo systemctl start ssh
 ------------------------------------------------------------------------------------------------------------------------
 // Overseer Only
 
+// This is a WSL installation of the latest Ubuntu LTS, do not use the same admin name/password as the remote machines.
 // Use the following to create your own private key, or use the one issued by the host provider
 
 // To generate a new 4096 bits SSH key pair with your email address as a comment
@@ -61,7 +63,7 @@ Host chosen_host_name
 // set permissions
 chmod 600 ~/.ssh/config
 
-//** Follow ansible_setup.txt instructions, then return to here **//
+// *********** Follow ansible_setup.txt instructions, then return to here *********** //
 
 // Create secure_server.yml playbook
 // Going to need community.general.ufw so install that now
@@ -131,7 +133,7 @@ nano ~/ansible/playbooks/secure_server/main.yml
 // save and exit
 
 // run the playbook - you will be asked for the Become(sudo) password because of the -K flag
-ansible-playbook -K ~/ansible/playbooks/secure_server/main.yml
+ansible-playbook -K ~/ansible/secure.yml
 
 // test connection to each remote machine
 ssh -p your_chosen_port chosen_admin_name@remote_ip_address

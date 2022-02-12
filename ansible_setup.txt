@@ -1,5 +1,9 @@
 
 // Overseer Only
+apt install python3-pip
+pip3 install packaging
+
+sudo add-apt-repository ppa:ansible/ansible-2.10
 
 // Install Ansible
 sudo apt install ansible
