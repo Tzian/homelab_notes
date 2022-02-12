@@ -11,7 +11,7 @@ workerM 192.168.?.? - Ubuntu Server
 
 // Dev tools implemented from: (Note: at my current level of experience, i have been unable to get 2 way communication
 // working, so for now others on the network cannot communicate back, only receive commands from this machine, which
-// is good enough for now)
+// is good enough for now
 overseer - wsl2 Ubuntu Server on Windows Machine
 
 // Special Guest - We have this old laptop which the other half uses from the woodworking shop or
@@ -33,6 +33,22 @@ sudo systemctl start ssh
 
 // This is a WSL installation of the latest Ubuntu LTS, do not use the same admin name/password as the remote machines.
 // Use the following to create your own private key, or use the one issued by the host provider
+
+// If wished can change the hostname
+sudo nano /etc/wsl.conf
+
+// add
+[network]
+hostname = 'new_name'
+generateHosts = false
+
+// save and exit
+
+sudo nano /etc/hosts
+// replace all occurances of the current hostname with the new one
+// save and exit, then shutdown
+// use windows powershell to check if it has completely shutdown, do not restart till it does
+wsl --list --running
 
 // To generate a new 4096 bits SSH key pair with your email address as a comment
 // You will be prompted to specify the file name: (/home/chosen_admin_name/.ssh/id_rsa)

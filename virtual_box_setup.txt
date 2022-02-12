@@ -1,14 +1,28 @@
 
+Open Oracle VM VirtualBox Manager
+Select New
+Give it a name eg: Master1
+Select Linus
+Select Ubuntu64
+Set Memory size to 2048MB
+Select Create a virtual hard disk now, and set size to 40GB (Ubuntu 20.04, requires 25GB)
+Leave rest as default, click Create
 
-// Settings
+// Adjust Settings
 
 General > Advanced - Shared Clipboard and Drag'n'Drop = Bidirectional
+
 System > Motherboard > Base Memory = 2048MB
+System > Motherboard > Pointing Device = PS/2 Mouse
 System > Processor = 1 and Enable PAE/NX
+
 Display > Video Memory 16MB
-Network > Adapter1 > Attached to Bridged Adapter
+
 Storage > Controller IDE > Click the blue disk icon > chose the iso or chose a disk file and navigate to the iso
+
+Network > Adapter1 > Attached to Bridged Adapter
 Network > Adapter1 > Expand Advanced, note the MAC Address
+
 Assign IP address to VMs MAC address on router.
 
 Start > Normal Start > Follow installation instructions
