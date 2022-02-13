@@ -1,4 +1,4 @@
-// Overseer Only
+// On your Dev machine, push to github for overseer to clone/update from
 
 // Create ansible project folder where all the playbooks/roles etc will be created
 mkdir ~/ansible
