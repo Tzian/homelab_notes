@@ -23,6 +23,8 @@ Storage > Controller IDE > Click the blue disk icon > chose the iso or chose a d
 Network > Adapter1 > Attached to Bridged Adapter
 Network > Adapter1 > Expand Advanced, note the MAC Address
 
-Assign IP address to VMs MAC address on router.
+Assign IP address to VMs MAC address on router
 
 Start > Normal Start > Follow installation instructions
+
+// NOTE: Take snapshots in places you can foresee are good points to reset back to

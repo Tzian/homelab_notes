@@ -1,12 +1,4 @@
-
 // Overseer Only
-apt install python3-pip
-pip3 install packaging
-
-sudo add-apt-repository ppa:ansible/ansible-2.10
-
-// Install Ansible
-sudo apt install ansible
 
 // Create ansible project folder where all the playbooks/roles etc will be created
 mkdir ~/ansible
@@ -92,3 +84,71 @@ rules:
 // ideally should be set as an env var, but atm having trouble with getting them to persist on WSL
 yamllint -c ~/ansible/.yamllint ~/ansible
 ansible-lint ~/ansible
+
+
+// Create secure_server.yml playbook
+// Going to need community.general.ufw so install that now
+ansible-galaxy collection install community.general
+
+nano ~/ansible/playbooks/secure_server/main.yml
+
+// add the following, ensuring to change things like your_chosen_port to the actual port you have chosen :D
+---
+- hosts: all
+  become: true
+
+  handlers:
+    - name: restart ssh
+      service:
+        name: sshd
+        state: restarted
+
+  tasks:
+    - name: Apt Update and Upgrade
+      apt:
+        update_cache: true
+        cache_valid_time: 3600
+        upgrade: 'yes'
+
+    - name: Make SSH more secure
+      lineinfile:
+        dest: /etc/ssh/sshd_config
+        regexp: "{{ item.regexp }}"
+        line: "{{ item.line }}"
+        state: present
+        validate: 'sshd -T -f %s'
+      with_items:
+        - regexp: "^#?PasswordAuthentication"
+          line: "PasswordAuthentication no"
+        - regexp: "^#?PermitRootLogin"
+          line: "PermitRootLogin no"
+        - regexp: "^#?Port"
+          line: "Port your_chosen_port"
+        - regexp: "^#?ChallengeResponseAuthentication"
+          line: "ChallengeResponseAuthentication no"
+        - regexp: "^#?UsePAM"
+          line: "UsePAM no"
+      notify: restart ssh
+
+    - name: Edit file permissions
+      file:
+        path: /etc/ssh/sshd_config
+        mode: 0600
+
+    - name: Deny all access to port 22
+      community.general.ufw:
+        rule: deny
+        port: '22'
+
+    - name: Allow access to port your_chosen_port
+      community.general.ufw:
+        rule: allow
+        port: your_chosen_port
+
+    - name: Auto remove unused packages
+      apt:
+        autoremove: 'yes'
+        purge: 'yes'
+
+
+// save and exit
