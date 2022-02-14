@@ -149,5 +149,5 @@ ssh master1
 // to allow others to use graphical applications on it.
 sudo adduser chosen_name
 
-// Update and Upgrade OS
+// Update and Upgrade OS - will fully upgrade and then upgrade the distro version if reqd
 ansible-playbook -K ~/ansible/updater.yml
