@@ -78,7 +78,7 @@ nano ~/.ssh/authorized_keys
                                   ----------------------------------------------------
 
 // Update/Upgrade and ensure Git is installed
-sudo apt update && sudo apt upgrade && sudo apt install git -y
+sudo apt update && sudo apt upgrade -y && sudo apt install git -y
 
 // Clone your ansible repo (you will need to input personal access token as password
 git clone https://github.com/YourName/ansible
@@ -126,7 +126,7 @@ chmod 600 ~/.ssh/config
 
 // Run the secure playbook you made to implement better security
 // You will be asked for the Become(sudo) password because of the -K flag
-ansible-playbook -K ~/ansible/secure.yml
+ansible-playbook -K ~/ansible/site.yml
 
 // test connection to each remote machine
 ssh -p your_chosen_port chosen_admin_name@remote_ip_address
