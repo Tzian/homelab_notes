@@ -1,4 +1,3 @@
-// No longer using this, using Vagrant instead
 
 Open Oracle VM VirtualBox Manager
 Select New
@@ -25,3 +24,5 @@ Assign IP address to VMs MAC address on router, alternatively if you are remakin
 for the IP address you want it to use, and enter it here.
 
 Start > Normal Start > Follow installation instructions
+
+// Take snapshots for reset points
