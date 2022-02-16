@@ -1,0 +1,49 @@
+// example vagrant file for 2 ubuntu machines with virtualbox, open gitbash in Vagrantfile location and run vagrant up, when done use vagrant destroy
+// vagrant halt just turns them off without destroying them
+
+
+// replace "mac_address" with the address ou wish to use for each machine, oh and leave the "" they are meant to surround it :D
+
+# -*- mode: ruby -*-
+# vi: set ft=ruby :
+
+Vagrant.configure("2") do |config|
+  config.vm.define "master1" do |vm1|
+    vm1.vm.hostname = "master1"
+    vm1.vm.box = "ubuntu/focal64"
+
+    # Create a public network, which generally matched to bridged network. Bridged networks make the machine appear as another physical device on your network.
+      vm1.vm.network "public_network", bridge: "Intel(R) Ethernet Connection (2) I219-V", :mac => "mac_address"
+
+    vm1.vm.provider "virtualbox" do |vb|
+      vb.name = "master1"
+      vb.gui = false
+      vb.memory = "2048"
+      vb.cpus = 1
+      vb.customize ['modifyvm', :id, '--graphicscontroller', 'vmsvga']
+    end
+
+    vm1.vm.provision "shell", run: "always", inline: <<-SHELL
+      echo "Hello, I am master1"
+    SHELL
+  end
+  config.vm.define "workerV" do |vm2|
+      vm2.vm.hostname = "workerV"
+      vm2.vm.box = "ubuntu/focal64"
+
+      # Create a public network, which generally matched to bridged network. Bridged networks make the machine appear as another physical device on your network.
+      vm2.vm.network "public_network", bridge: "Intel(R) Ethernet Connection (2) I219-V", :mac => "mac_address"
+
+      vm2.vm.provider "virtualbox" do |vb|
+        vb.name = "workerV"
+        vb.gui = false
+        vb.memory = "2048"
+        vb.cpus = 1
+        vb.customize ['modifyvm', :id, '--graphicscontroller', 'vmsvga']
+      end
+
+      vm2.vm.provision "shell", run: "always", inline: <<-SHELL
+        echo "Hello, I am workerV"
+      SHELL
+    end
+end

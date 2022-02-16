@@ -1,3 +1,4 @@
+// No longer using this, using Vagrant instead
 
 Open Oracle VM VirtualBox Manager
 Select New
@@ -10,10 +11,7 @@ Leave rest as default, click Create
 
 // Adjust Settings
 
-General > Advanced - Shared Clipboard and Drag'n'Drop = Bidirectional
-
 System > Motherboard > Base Memory = 2048MB
-System > Motherboard > Pointing Device = PS/2 Mouse
 System > Processor = 1 and Enable PAE/NX
 
 Display > Video Memory 16MB
@@ -27,5 +25,3 @@ Assign IP address to VMs MAC address on router, alternatively if you are remakin
 for the IP address you want it to use, and enter it here.
 
 Start > Normal Start > Follow installation instructions
-
-// NOTE: Take snapshots in places you can foresee are good points to reset back to
