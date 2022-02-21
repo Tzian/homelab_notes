@@ -1,5 +1,5 @@
 // Not going to be using vagrant, too much hassle for very little gain, i can manually create the vms as quick and i get to use my own username,
-// password and ssh keys
+// password and ssh keys, and with snapshots as well, yeah too much faff
 
 
 // example vagrant file for 2 ubuntu machines with virtualbox, open gitbash in Vagrantfile location and run vagrant up, when done use vagrant destroy

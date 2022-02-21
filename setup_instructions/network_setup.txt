@@ -1,0 +1,116 @@
+// Homelab Inventory Example
+
+master1 192.168.?.? - Virtual Box Ubuntu Server on Windows Machine
+master2 192.168.?.? - Ubuntu Server
+workerB 192.168.?.? - Ubuntu Desktop (machines that are also providing gui for specific graphical application usage)
+workerD 192.168.?.? - Ubuntu Server
+workerS 192.168.?.? - Ubuntu Desktop
+workerM 192.168.?.? - Ubuntu Server
+
+// Haha yes i see it, the letters are in fact reference to physical machines location, with hilarious results
+
+// Dev tools implemented from: (Note: at my current level of experience, i have been unable to get 2 way communication
+// working, so for now others on the network cannot communicate back, only receive commands from this machine, which
+// is good enough for now
+overseer - wsl2 Ubuntu Server on Windows Machine
+
+// Special Guest - We have this old laptop which the other half uses from the woodworking shop or
+// barn to view files kept in storage, so this is to remind me to monitor it and update as needed
+laptopName 192.168.?.? - low resource laptop using Lubuntu, added in for manual updating and monitoring
+
+------------------------------------------------------------------------------------------------------------------------
+// Remote Machines
+
+// Install latest Ubuntu LTS Server/Desktop as specified above
+// Set initial user on each to an admin name and password chosen (this is to be the same for all)
+// You can choose to install ssh as part of the server installation, do so
+
+// Once installed check ssh is installed and running on each
+sudo systemctl status ssh
+
+// If not (desktop version) install
+sudo apt install openssh-server
+sudo systemctl enable ssh
+sudo systemctl start ssh
+
+------------------------------------------------------------------------------------------------------------------------
+-- // OVERSEER ONLY //
+// This is a WSL installation of the latest Ubuntu LTS, do NOT use the same admin name/password as the remote machines
+
+                                  ----------------------------------------------------
+
+// Add ansible repository to apt
+sudo add-apt-repository --yes --update ppa:ansible/ansible
+
+// Ensure software-properties-common is installed and install ansible
+sudo apt install software-properties-common ansible git -y
+
+// Fetch ansible repo
+// Clone your ansible repo (you will need to input personal access token as password)
+git clone https://github.com/YourName/ansible
+
+// copy your version controlled config file to where ansible will look for it
+cp ~/ansible/vc_ansible.cfg ~/ansible.cfg
+
+// *** IMPORTANT *** - Remember if you push changes to the repo, you will need to update the overseer's copy
+// also if the ansible.cfg file is altered then you need to repeat the copy command
+cd ansible
+git pull
+
+// run the overseer's setup playbook, you will be asked for the become password
+ansible-playbook -K ~/ansible/setup_overseer.yml
+
+// shutdown to update the name change
+wsl.exe --shutdown
+
+// use windows powershell to check if it has completely shutdown, do NOT restart till it has
+wsl --list --running
+
+                                  ----------------------------------------------------
+
+// Create private key for SSH connection
+
+// Generate a new 4096 bits SSH key pair with your email address as a comment
+// You will be prompted to specify the file name: (/home/chosen_admin_name/.ssh/id_rsa), this default should be ok
+// Press Enter to accept and continue
+// To leave the passphrase empty, just Press Enter, otherwise type your phrase
+// You will be asked to repeat your phrase
+// Output should be - /home/chosen_admin_name/.ssh/id_rsa /home/chosen_admin_name/.ssh/id_rsa.pub
+ssh-keygen -t rsa -b 4096 -C "your_email_address"
+
+// copies the key to the remote server, requires input yes, to accept adding to local known_hosts (repeat for each)
+ssh-copy-id -i ~/.ssh/id_rsa.pub chosen_admin_name@servers_url
+
+
+// run the setup remotes playbook, this will ask you to enter the ssh and become passwords
+ansible-playbook ~/ansible/setup_remotes.yml --ask-pass --ask-become-pass
+
+// the remote machines will reboot, be patient go make a coffee
+
+                                  ----------------------------------------------------
+
+// run the update overseer playbook, re-enables strict host checking, updates port to use, and checks connections
+ansible-playbook ~/ansible/update_overseer.yml
+
+// For machines with GUI, create a non sudoer user with a chosen name and password,
+// to allow others to use graphical applications on it.
+ssh remote_machine (inventory name)
+sudo adduser chosen_name
+
+// Update and Upgrade OS - will fully upgrade and then upgrade the distro version if reqd
+ansible-playbook -K ~/ansible/update_remotes.yml
+
+                                  ----------------------------------------------------
+
+// Install kubernetes
+
+// install on master
+ansible-playbook -K ~/ansible/install_k3s_master.yml
+
+// install on workers
+ansible-playbook -K ~/ansible/install_k3s_workers.yml
+
+// check our nodes
+kubectl get nodes
+
+                                  ----------------------------------------------------

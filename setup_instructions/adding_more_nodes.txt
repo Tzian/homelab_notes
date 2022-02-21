@@ -1,0 +1,29 @@
+// Adding more nodes
+
+// add the nodes to ~/inventory/hosts in the ansible repo, update overseers copy
+
+// update the add new node playbook with the new node details (NOTE: make sure the marker text is unique otherwise overwrites will happen)
+ansible-playbook ~/ansible/add_new_node.yml
+
+// copy the key to the new node, requires input yes, to accept adding to local known_hosts (repeat for each)
+ssh-copy-id -i ~/.ssh/id_rsa.pub chosen_admin_name@servers_url
+
+// run the setup remotes playbook, this will ask you to enter the ssh and become passwords
+ansible-playbook ~/ansible/setup_remotes.yml --ask-pass --ask-become-pass
+
+// the remote machines will reboot, be patient go make a coffee
+
+                                  ----------------------------------------------------
+
+// run the update overseer playbook, re-enables strict host checking, updates port to use, and checks connections
+ansible-playbook ~/ansible/update_overseer.yml
+
+// For machines with GUI, create a non sudoer user with a chosen name and password,
+// to allow others to use graphical applications on it.
+ssh remote_machine (inventory name)
+sudo adduser chosen_name
+
+// Update and Upgrade OS - will fully upgrade and then upgrade the distro version if reqd
+ansible-playbook -K ~/ansible/update_remotes.yml
+
+                                  ----------------------------------------------------
