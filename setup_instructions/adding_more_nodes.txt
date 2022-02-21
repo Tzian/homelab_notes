@@ -23,7 +23,13 @@ ansible-playbook ~/ansible/update_overseer.yml
 ssh remote_machine (inventory name)
 sudo adduser chosen_name
 
-// Update and Upgrade OS - will fully upgrade and then upgrade the distro version if reqd (if it does, it takes quite a while)
+// Update and Upgrade OS - will fully upgrade and then upgrade the distro version if required (if it does, it takes quite a while)
 ansible-playbook -K ~/ansible/update_remotes.yml
 
                                   ----------------------------------------------------
+
+// install k3s on new nodes
+ansible-playbook -K ~/ansible/install_k3s_workers.yml
+
+// check our nodes
+kubectl get nodes
