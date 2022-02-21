@@ -2,8 +2,8 @@
 
 // from ~/ (update version numbers as necessary)
 sudo apt update && sudo apt upgrade -y
-sudo apt install build-essential libssl-dev
-sudo apt install gdb
+sudo apt install build-essential libssl-dev -y
+sudo apt install gdb -y
 
 // ensure that the version number is the latest one clion supports
 wget https://github.com/Kitware/CMake/releases/download/v3.21.5/cmake-3.21.5.tar.gz
@@ -16,8 +16,13 @@ make
 sudo make install
 
 ------------------------------------------------------------------------------------------------------------------------
+
+git clone https://github.com/YourName/YourRepo
+
 // Set Clion to use the above installs
 // Settings> Build Execution Deployment > Toolchains
 
+// Create a new WSL toolchain, use the up arrow to move it up to default position
+// It should automatically pick up your linux installation within WSL
 CMake : \\wsl$\Ubuntu-20.04\usr\local\bin\cmake
-Debugger : \\wsl$\Ubuntu-20.04WSL GDB\
+Debugger : WSL GDB
