@@ -1,0 +1,42 @@
+---
+- hosts: master
+  gather_facts: 'yes'
+  become: 'yes'
+  tasks:
+    - name: Get k3s token
+      shell: 'cat /var/lib/rancher/k3s/server/node-token'
+      register: cluster_token
+
+    - debug:
+        var: cluster_token
+
+    - name: Create fact
+      set_fact:
+        cluster_token: '{{ cluster_token.stdout }}'
+
+- hosts: workers
+  gather_facts: 'yes'
+  become: 'yes'
+  tasks:
+    - name: Apt Update and Upgrade
+      apt:
+        update_cache: 'yes'
+        upgrade: 'yes'
+
+    - name: Ensure Python3 is installed.
+      apt:
+        name: python3
+        state: present
+
+    - name: Populate service facts
+      service_facts:
+
+    - debug:
+        var: ansible_facts.services["k3s-agent.service"]
+
+    - debug:
+        var: "hostvars.master1.cluster_token"
+
+    - name: Install k3s if not already
+      shell: "curl -sfL https://get.k3s.io | K3S_URL=https://<MASTERS_URL>:6443 K3S_TOKEN={{ hostvars.master1.cluster_token }} sh -"
+      when: ansible_facts.services["k3s-agent.service"] is not defined

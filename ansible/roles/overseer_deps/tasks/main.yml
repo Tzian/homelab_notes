@@ -1,0 +1,40 @@
+- name: Ensure dependancies are installed
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+    state: present
+
+- name: Download kubernetes public signing key
+  command: curl -fsSLo /usr/share/keyrings/kubernetes-archive-keyring.gpg https://packages.cloud.google.com/apt/doc/apt-key.gpg
+
+- name: Add Kubernetes repo
+  command: echo "deb [signed-by=/usr/share/keyrings/kubernetes-archive-keyring.gpg] https://apt.kubernetes.io/ kubernetes-xenial main"
+  register: k8s_output
+
+- name: And add the output to /etc/apt/sources.list.d/kubernetes.list
+  copy:
+    content: "{{ k8s_output.stdout }}"
+    dest: /etc/apt/sources.list.d/kubernetes.list
+  delegate_to: localhost
+
+- name: Update Apt
+  apt:
+    upgrade: 'yes'
+    update_cache: 'yes'
+
+- name: Install kubectl
+  apt:
+    name:
+      - kubectl
+    state: present
+
+- name: Download installer for Helm
+  command: curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3
+
+- name: Update the installer's permissions
+  command: chmod 700 get_helm.sh
+
+- name: Install Helm
+  command: ./get_helm.sh

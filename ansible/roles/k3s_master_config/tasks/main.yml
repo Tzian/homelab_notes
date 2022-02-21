@@ -1,0 +1,16 @@
+- name: Check if file already exists in .kube directory
+  stat:
+    path: "~/.kube/config"
+  register: config
+
+- name: Create .kube directory
+  command: mkdir ~/.kube
+  when: not config.stat.exists
+
+- name: Copy k3s.yaml file to ~/.kube/config
+  command: cp /etc/rancher/k3s/k3s.yaml ~/.kube/config
+  when: not config.stat.exists
+
+- name: Set config file permissions
+  command: chmod 666 ~/.kube/config
+  when: not config.stat.exists

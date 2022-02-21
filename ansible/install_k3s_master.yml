@@ -1,0 +1,16 @@
+---
+- hosts: master
+  gather_facts: 'yes'
+  become: 'yes'
+  roles:
+    - k3s_master
+
+- hosts: master
+  become: 'no'
+  roles:
+    - k3s_master_config
+
+- hosts: localhost
+  become: 'no'
+  roles:
+    - k3s_overseer_config

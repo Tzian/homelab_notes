@@ -1,0 +1,10 @@
+[master]
+master1
+
+[workers]
+worker-v
+worker-s
+
+[all:children]
+master
+workers

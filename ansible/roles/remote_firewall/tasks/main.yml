@@ -1,0 +1,15 @@
+- name: Allow access to port <CHOSEN_PORT>
+  community.general.ufw:
+    rule: allow
+    port: '<CHOSEN_PORT>'
+
+- name: Deny all access to port 22
+  community.general.ufw:
+    rule: deny
+    port: '22'
+
+- name: Enable firewall
+  systemd:
+    name: ufw
+    state: started
+    enabled: 'yes'

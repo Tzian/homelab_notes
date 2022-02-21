@@ -1,0 +1,4 @@
+- name: reboot machine
+  shell: sleep 5 && shutdown -r now
+  async: 1
+  poll: 0

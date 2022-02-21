@@ -1,0 +1,25 @@
+- name: Set new hostname and stop auto generation in /etc/wsl.conf
+  blockinfile:
+    path: /etc/wsl.conf
+    block: |
+      [network]
+      hostname = overseer
+      generateHosts = false
+    create: true
+
+- name: Remove unwanted line in /etc/hosts
+  vars:
+    remove_host: "<A LINE YOU WANT TO REMOVE>"
+  lineinfile:
+    path: /etc/hosts
+    regexp: "{{ remove_host }}"
+    state: absent
+
+- name: Change hostname to overseer in /etc/hosts
+  vars:
+    remove_host: "127.0.1.1"
+  lineinfile:
+    path: /etc/hosts
+    state: present
+    regexp: "{{ remove_host }}"
+    line: "127.0.1.1  overseer.localdomain  overseer"

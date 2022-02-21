@@ -1,10 +1,8 @@
 // Not going to be using vagrant, too much hassle for very little gain, i can manually create the vms as quick and i get to use my own username,
-// password and ssh keys, and with snapshots as well, yeah too much faff
-
+// password and ssh keys, and with snapshots making life super easy as well.......
 
 // example vagrant file for 2 ubuntu machines with virtualbox, open gitbash in Vagrantfile location and run vagrant up, when done use vagrant destroy
 // vagrant halt just turns them off without destroying them
-
 
 // replace "mac_address" with the address ou wish to use for each machine, oh and leave the "" they are meant to surround it :D
 

@@ -1,0 +1,35 @@
+- name: Enable StrictHostKeyChecking to accept new
+  lineinfile:
+    path: ~/ansible.cfg
+    state: present
+    regexp: "ssh_args = -o StrictHostKeyChecking=yes"
+    line: "ssh_args = -o StrictHostKeyChecking=accept-new"
+
+- name: Create .ssh directory
+  file:
+    path: ~/.ssh
+    state: directory
+    mode: '0755'
+
+- name: Create ssh configuration file
+  file:
+    path: ~/.ssh/config
+    state: touch
+    mode: '0600'
+
+- name: Add entries to ssh config
+  blockinfile:
+    path: ~/.ssh/config
+    marker: "# *** {mark} ***"
+    marker_begin: "ADDED WITH ANSIBLE - BEGIN ADD NODES - initial"
+    marker_end: "ADDED WITH ANSIBLE - END ADD NODES - initial"
+    block: |      
+      Host master1
+        HostName <MASTER_URL>
+        User <CHOSEN_ADMIN_NAME>
+        Port 22
+      
+      Host worker-v
+        HostName <WORKER_URL>
+        User <CHOSEN_ADMIN_NAME>
+        Port 22

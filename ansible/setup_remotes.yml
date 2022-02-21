@@ -1,0 +1,8 @@
+---
+- hosts: all
+  gather_facts: 'yes'
+  become: 'yes'
+  roles:
+    - remote_timesync
+    - remote_secure_ssh
+    - remote_firewall

@@ -1,0 +1,17 @@
+---
+- hosts: localhost
+  gather_facts: 'no'
+  become: 'no'
+  tasks:
+    - name: Add new node to ssh config
+      blockinfile:
+        path: ~/.ssh/config
+        insertafter: EOF
+        marker: "# *** {mark} ***"
+        marker_begin: "ADDED WITH ANSIBLE - BEGIN ADD NODES - worker-s"
+        marker_end: "ADDED WITH ANSIBLE - END ADD NODES - worker-s"
+        block: |
+          Host worker-s
+            HostName <NODES_URL>
+            User <CHOSEN_ADMIN_NAME>
+            Port 22

@@ -1,0 +1,27 @@
+---
+- hosts: localhost
+  gather_facts: 'no'
+  become: 'no'
+  tasks:
+    - name: Stop StrictHostKeyChecking from accepting new
+      lineinfile:
+        path: ~/ansible.cfg
+        state: present
+        regexp: "ssh_args = -o StrictHostKeyChecking=accept-new"
+        line: "ssh_args = -o StrictHostKeyChecking=yes"
+
+    - name: Update port for remotes
+      replace:
+        path: ~/.ssh/config
+        regexp: "  Port 22"
+        replace: "  Port <CHOSEN_PORT>"
+
+- hosts: all
+  gather_facts: 'no'
+  become: 'no'
+  tasks:
+    - name: Check connections
+      wait_for:
+        port: <CHOSEN_PORT>
+        delay: 10
+        timeout: 60

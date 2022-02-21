@@ -1,0 +1,13 @@
+---
+- hosts: localhost
+  gather_facts: 'no'
+  become: 'yes'
+  roles:
+    - overseer_deps
+    - overseer_rename
+
+- hosts: localhost
+  gather_facts: 'no'
+  become: 'no'
+  roles:
+    - overseer_ssh

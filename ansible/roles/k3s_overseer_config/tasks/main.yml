@@ -1,0 +1,17 @@
+- name: Create .kube directory
+  file:
+    path: ~/.kube
+    state: directory
+
+- name: Copy cluster config file to overseer
+  command: scp -P <CHOSEN_PORT> <CHOSEN_ADMIN_NAME>@<MASTER_URL>:~/.kube/config ~/.kube/config
+
+- name: Update Cluster IP Addy
+  lineinfile:
+    path: ~/.kube/config
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  with_items:
+    - regexp: "    server: https://127.0.0.1:6443"
+      line: "    server: https://<MASTER_URL>:6443"

@@ -1,0 +1,27 @@
+- name: Apt Update and Upgrade
+  apt:
+    update_cache: 'yes'
+    upgrade: 'yes'
+
+- name: Ensure Python3 is installed.
+  apt:
+    name: python3
+    state: present
+
+- name: Populate service facts
+  service_facts:
+
+- debug:
+    var: ansible_facts.services["k3s.service"]
+
+- name: Install k3s if not already
+  shell: "curl -sfL https://get.k3s.io | INSTALL_K3S_EXEC='--tls-san <MASTER_URL> --node-external-ip <MASTER_URL> --node-taint CriticalAddonsOnly=true:NoExecute' K3S_KUBECONFIG_MODE='644' sh -"
+  args:
+    warn: 'no'
+  when: ansible_facts.services["k3s.service"] is not defined
+
+- name: Check if port 6443 is listening
+  wait_for:
+    port: 6443
+    delay: 5
+    timeout: 120
