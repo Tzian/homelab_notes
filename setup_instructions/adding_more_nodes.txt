@@ -20,7 +20,7 @@ ansible-playbook ~/ansible/update_overseer.yml
 
 // For machines with GUI, create a non sudoer user with a chosen name and password,
 // to allow others to use graphical applications on it.
-ssh remote_machine (inventory name)
+ssh remotes_inventory_name
 sudo adduser chosen_name
 
 // Update and Upgrade OS - will fully upgrade and then upgrade the distro version if required (if it does, it takes quite a while)
